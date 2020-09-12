@@ -24,7 +24,7 @@ body{
     width: 100vw;
 }
 a{
-    color: var(--color-text);
+    color: var(--color-high-text);
     text-decoration: none;
 }
 .clear-fix::after{
