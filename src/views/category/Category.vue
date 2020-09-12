@@ -3,6 +3,13 @@
     <nav-bar class="cnavbar">
       商品分类
     </nav-bar>
+    <tab-control 
+        class="vice-tab"
+        ref="tabcontrol1"
+        :titles="titles"
+        @tabClick="dtabclick"
+        v-show="!isshow"
+      />
     <scroll
       class="content sider"
       :pull-up-load="true"
@@ -13,8 +20,10 @@
     </scroll>
     <scroll
       class="content"
+      :probe="3"
       :pull-up-load="true"
       @pullUp="scrollrefresh"
+      @onscroll="getposition"
       ref="cscroll1"
     >
       <div class="subitems">
@@ -24,10 +33,11 @@
         ref="tabcontrol"
         :titles="titles"
         @tabClick="dtabclick"
+        v-show="isshow"
       />
       <category-rec-item 
         :recommenditemdata="recommenditemdata"
-        @recload="imgload"
+        @recload="reimgload"
       />
     </scroll>
   </div>
@@ -60,7 +70,9 @@ export default {
         new:[],
         sell:[]
       },
-      recommenditemdata:[]
+      recommenditemdata:[],
+      tcheight:0,
+      isshow:true
     };
   },
   components: {
@@ -71,6 +83,9 @@ export default {
     CategorySubItem,
     CategoryRecItem
   },
+  computed:{
+   
+  },
   methods: {
     //监听相关
     scrollrefresh() {
@@ -79,11 +94,17 @@ export default {
     },
     imgload(){
       this.refresh()
+      this.tcheight = this.$refs.tabcontrol.$el.offsetTop
+    },
+    reimgload(){
+      this.refresh()
     },
     dtabclick(index){
       const types = ['pop','new','sell']
       this.currenttype = types[index]
       this.recommenditemdata = this.recommenddata[this.currenttype]
+      this.$refs.tabcontrol1.currentindex = index  
+      this.$refs.tabcontrol.currentindex = index
       // console.log(this.recommenddata['pop'])
     },
     getrecodata(miniWallkey){
@@ -95,6 +116,12 @@ export default {
         })
       }
       this.recommenditemdata = this.recommenddata[this.currenttype]
+    },
+    getposition(position){
+     
+      // console.log(this.tcheight)
+      // console.log(position)
+      this.isshow = -position.y <= this.tcheight - 44
     },
     //网络相关
     //1.请求分类总数据
@@ -159,5 +186,14 @@ export default {
 .subitems {
   display: inline-block;
   width: 100%;
+}
+.vice-tab {
+  position: fixed;
+  width: 75%;
+  top: 44px;
+  right: 0;
+  background-color: #fff;
+  z-index: 9;
+
 }
 </style>
